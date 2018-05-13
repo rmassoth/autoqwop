@@ -17,84 +17,97 @@ from selenium.webdriver.common.action_chains import ActionChains
 from PIL import Image
 
 
-def load_driver():
+
+class AUTOQWOP:
     """
 
-    Loads the webdriver and gets the page with the game
+    Class to wrap all the methods for automatically playing the game QWOP
     """
-    driver = webdriver.Firefox()
-    driver.get("http://foddy.net/Athletics.html?webgl=true")
-    return driver
-
-
-def get_game(driver):
-    """
-
-    Initialize the browser and click the game window to get started
-    """
-    try:
-        game = WebDriverWait(driver, 20).until(
-            EC.presence_of_element_located((By.ID, "window1")))
-        print("Game window found")
-        time.sleep(5)
-        game.click()
-        return game
-    except TimeoutException:
-        print("Game took too much time to load!")
-        return False
-
-
-def get_frame(game):
-    """
-
-    Gets a single frame of the game as a png file and returns it
-    """
-    image = Image.open(io.BytesIO(game.screenshot_as_png))
-    return image
-
-def update_outputs(driver, key_states):
-    """
-
-    Takes in the state of the keys 'qwop' and changes the keyup/down
-    state to the browser
-    """
-    actions = ActionChains(driver)
-    if key_states[0]:
-        actions.key_down("q")
-    else:
-        actions.key_up("q")
     
-    if key_states[1]:
-        actions.key_down("w")
-    else:
-        actions.key_up("w")
+    def __init__(self):
+        self.driver = webdriver.Firefox()
+        self.game = None
+
+    def __del__(self):
+        self.driver.quit()
+
+
+    def load_website(self):
+        """
+
+        Loads the webdriver and gets the page with the game
+        """
+        self.driver.get("http://foddy.net/Athletics.html?webgl=true")
+
+
+    def get_game(self):
+        """
+
+        Initialize the browser and click the game window to get started
+        """
+        try:
+            self.game = WebDriverWait(self.driver, 20).until(
+                EC.presence_of_element_located((By.ID, "window1")))
+            print("Game window found")
+            time.sleep(5)
+            self.game.click()
+        except TimeoutException:
+            print("Game took too much time to load!")
+
+
+    def get_frame(self):
+        """
+
+        Gets a single frame of the game as a png file and returns it
+        """
+        image = Image.open(io.BytesIO(self.game.screenshot_as_png))
+        return image
+
+    def update_outputs(self, key_states):
+        """
+
+        Takes in the state of the keys 'qwop' and changes the keyup/down
+        state to the browser
+        """
+        actions = ActionChains(self.driver)
+        if key_states[0]:
+            actions.key_down("q")
+        else:
+            actions.key_up("q")
+        
+        if key_states[1]:
+            actions.key_down("w")
+        else:
+            actions.key_up("w")
+        
+        if key_states[2]:
+            actions.key_down("o")
+        else:
+            actions.key_up("o")
+        
+        if key_states[3]:
+            actions.key_down("p")
+        else:
+            actions.key_up("p")
+
+        actions.perform()
+
+    def test_for_game_over(self):
+        """
+
+        Check every frame to see if the game has ended
+        """
+        game_over = self.driver.execute_script("return t;")
+        return game_over
     
-    if key_states[2]:
-        actions.key_down("o")
-    else:
-        actions.key_up("o")
-    
-    if key_states[3]:
-        actions.key_down("p")
-    else:
-        actions.key_up("p")
-
-    actions.perform()
-
-def test_for_failed(image):
-    """
-
-    Check every frame to see if it matches a failure state in the game
-    """
-    pass
 
 def main():
     """
 
     Run many iterations and evolve the best combination of keys and time 
     """
-    driver = load_driver()
-    game = get_game(driver)
+    auto_qwop = AUTOQWOP()
+    auto_qwop.load_website()
     num_iterations = 10
     states = (
         (True, False, False, False),

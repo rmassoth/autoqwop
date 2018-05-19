@@ -1,3 +1,5 @@
+import time
+
 from autoQWOP.auto_qwop import AUTOQWOP
 from selenium.webdriver.firefox.webdriver import WebDriver
 from selenium.webdriver.firefox.webelement import FirefoxWebElement
@@ -5,6 +7,7 @@ from selenium.webdriver.firefox.webelement import FirefoxWebElement
 import pytest
 
 from PIL import Image
+import numpy as np
 
 
 @pytest.fixture(scope="module")
@@ -34,5 +37,32 @@ def test_get_image(qwop):
     assert image.height == 400
     assert image.width == 640
 
+def test_mse(qwop):
+    image1 = np.array(Image.open("tests/images/failed1.png"))
+    image2 = np.array(Image.open("tests/images/failed2.png"))
+    assert qwop.mse(image1, image2) > 0.0
+    assert qwop.mse(image1, image1) == 0.0
+
 def test_failed_state(qwop):
-    assert qwop.test_for_game_over() == False
+    image1 = Image.open("tests/images/failed1.png")
+    image2 = Image.open("tests/images/failed2.png")
+    image3 = Image.open("tests/images/failed3.png")
+    image4 = Image.open("tests/images/start.png")
+    image5 = Image.open("tests/images/standing1.png")
+    image6 = Image.open("tests/images/squatting1.png")
+    assert qwop.test_for_game_over(image1) == True
+    assert qwop.test_for_game_over(image2) == True
+    assert qwop.test_for_game_over(image3) == True
+    assert qwop.test_for_game_over(image4) == False
+    assert qwop.test_for_game_over(image5) == False
+    assert qwop.test_for_game_over(image6) == False
+
+def test_restart(qwop):
+    qwop.update_outputs((False, False, True, True))
+    
+    while(not qwop.test_for_game_over(qwop.get_frame())):
+        time.sleep(1)
+    qwop.update_outputs((False, False, False, False))
+    qwop.restart()
+    assert qwop.test_for_game_over(qwop.get_frame()) == False
+

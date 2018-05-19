@@ -13,8 +13,10 @@ from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.common.by import By
 from selenium.common.exceptions import TimeoutException
 from selenium.webdriver.common.action_chains import ActionChains
+from selenium.webdriver.common.keys import Keys
 
 from PIL import Image
+import numpy as np
 
 
 
@@ -92,13 +94,43 @@ class AUTOQWOP:
 
         actions.perform()
 
-    def test_for_game_over(self):
+
+    def test_for_game_over(self, image):
         """
 
-        Check every frame to see if the game has ended
+        Compare an image to the master failed image. Return True if they
+        are similar, False if not.
         """
-        game_over = self.driver.execute_script("return t;")
-        return game_over
+        failed_threshold = 5000
+        image_offset = (126, 99, 510, 297,)
+        cropped_image = image.crop(image_offset)
+        failed_image = Image.open("autoQWOP/images/failed_test.png")
+        mse = self.mse(np.array(cropped_image), np.array(failed_image))
+        print(mse)
+
+        if mse < failed_threshold:
+            return True
+        else:
+            return False
+
+
+    def mse(self, image1, image2):
+        """
+
+        Get the mean squared error between two images. Must be numpy arrays.
+        Borrowed from pyimagesearch.com.
+        """
+        err = np.sum((image1.astype("float") - image2.astype("float")) ** 2)
+        err /= float(image1.shape[0] * image1.shape[1])
+
+        # return the MSE, the lower the error, the more "similar"
+        # the two images are
+        return err
+
+    def restart(self):
+        actions = ActionChains(self.driver)
+        actions.key_down(Keys.SPACE).key_up(Keys.SPACE)
+        actions.perform()
     
 
 def main():
@@ -108,16 +140,8 @@ def main():
     """
     auto_qwop = AUTOQWOP()
     auto_qwop.load_website()
+    auto_qwop.get_game()
     num_iterations = 10
-    states = (
-        (True, False, False, False),
-        (True, False, False, False),
-        (False, True, False, False),
-        (False, True, False, False),
-        (False, False, True, False),
-        (False, False, True, False),
-        (False, False, False, True),
-        (False, False, False, True))
     try:
         for state in states:
             update_outputs(driver, state)

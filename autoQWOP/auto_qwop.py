@@ -18,6 +18,7 @@ from selenium.webdriver.common.keys import Keys
 from PIL import Image
 import numpy as np
 
+from genetic import *
 
 
 class AUTOQWOP:
@@ -65,33 +66,94 @@ class AUTOQWOP:
         image = Image.open(io.BytesIO(self.game.screenshot_as_png))
         return image
 
-    def update_outputs(self, key_states):
+    def update_outputs(self, key_state):
         """
 
         Takes in the state of the keys 'qwop' and changes the keyup/down
         state to the browser
         """
-        actions = ActionChains(self.driver)
-        if key_states[0]:
-            actions.key_down("q")
-        else:
-            actions.key_up("q")
-        
-        if key_states[1]:
-            actions.key_down("w")
-        else:
-            actions.key_up("w")
-        
-        if key_states[2]:
-            actions.key_down("o")
-        else:
-            actions.key_up("o")
-        
-        if key_states[3]:
-            actions.key_down("p")
-        else:
-            actions.key_up("p")
 
+        actions = ActionChains(self.driver)
+        if key_state == '0':
+            actions.key_up("q")
+            actions.key_up("w")
+            actions.key_up("o")
+            actions.key_up("p")
+        elif key_state == '1':
+            actions.key_down("q")
+            actions.key_up("w")
+            actions.key_up("o")
+            actions.key_up("p")
+        elif key_state == '2':
+            actions.key_up("q")
+            actions.key_down("w")
+            actions.key_up("o")
+            actions.key_up("p")
+        elif key_state == '3':
+            actions.key_up("q")
+            actions.key_up("w")
+            actions.key_down("o")
+            actions.key_up("p")
+        elif key_state == '4':
+            actions.key_up("q")
+            actions.key_up("w")
+            actions.key_up("o")
+            actions.key_down("p")
+        elif key_state == '5':
+            actions.key_down("q")
+            actions.key_down("w")
+            actions.key_up("o")
+            actions.key_up("p")
+        elif key_state == '6':
+            actions.key_down("q")
+            actions.key_up("w")
+            actions.key_down("o")
+            actions.key_up("p")
+        elif key_state == '7':
+            actions.key_down("q")
+            actions.key_up("w")
+            actions.key_up("o")
+            actions.key_down("p")
+        elif key_state == '8':
+            actions.key_up("q")
+            actions.key_down("w")
+            actions.key_down("o")
+            actions.key_up("p")
+        elif key_state == '9':
+            actions.key_up("q")
+            actions.key_down("w")
+            actions.key_up("o")
+            actions.key_down("p")
+        elif key_state == 'a':
+            actions.key_up("q")
+            actions.key_up("w")
+            actions.key_down("o")
+            actions.key_down("p")
+        elif key_state == 'b':
+            actions.key_down("q")
+            actions.key_down("w")
+            actions.key_down("o")
+            actions.key_up("p")
+        elif key_state == 'c':
+            actions.key_down("q")
+            actions.key_up("w")
+            actions.key_down("o")
+            actions.key_down("p")
+        elif key_state == 'd':
+            actions.key_down("q")
+            actions.key_down("w")
+            actions.key_up("o")
+            actions.key_down("p")
+        elif key_state == 'e':
+            actions.key_up("q")
+            actions.key_down("w")
+            actions.key_down("o")
+            actions.key_down("p")
+        elif key_state == 'f':
+            actions.key_down("q")
+            actions.key_down("w")
+            actions.key_down("o")
+            actions.key_down("p")
         actions.perform()
 
 
@@ -106,7 +168,7 @@ class AUTOQWOP:
         cropped_image = image.crop(image_offset)
         failed_image = Image.open("autoQWOP/images/failed_test.png")
         mse = self.mse(np.array(cropped_image), np.array(failed_image))
-        print(mse)
+        #print(mse)
 
         if mse < failed_threshold:
             return True
@@ -142,16 +204,22 @@ def main():
     auto_qwop.load_website()
     auto_qwop.get_game()
     num_iterations = 10
+    chromo = Chromosome()
+    chromo.sequence = get_random_sequence(10)
+    game_over = False
     try:
-        for state in states:
-            update_outputs(driver, state)
-            time.sleep(.5)
-        time.sleep(3)
+        while not game_over:
+            for state in chromo.sequence:
+                auto_qwop.update_outputs(state)
+                time.sleep(.03)
+            game_over = auto_qwop.test_for_game_over(
+                auto_qwop.get_frame())
+        time.sleep(2)
     except Exception as e:
         print(e)
     finally:
         #clean up
-        driver.quit()
+        auto_qwop.driver.quit()
 
 if __name__ == "__main__":
     main()

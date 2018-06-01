@@ -176,6 +176,25 @@ class AUTOQWOP:
             return False
 
 
+    def test_for_game_won(self, image):
+        """
+
+        Compare an image to the master failed image. Return True if they
+        are similar, False if not.
+        """
+        finished_threshold = 10000
+        image_offset = (126, 99, 510, 297,)
+        cropped_image = image.crop(image_offset)
+        finished_image = Image.open("autoQWOP/images/finish_test.png")
+        mse = self.mse(np.array(cropped_image), np.array(finished_image))
+        #print(mse)
+
+        if mse < finished_threshold:
+            return True
+        else:
+            return False
+
+
     def mse(self, image1, image2):
         """
 
@@ -204,17 +223,31 @@ def main():
     auto_qwop.load_website()
     auto_qwop.get_game()
     num_iterations = 10
-    chromo = Chromosome()
-    chromo.sequence = get_random_sequence(10)
-    game_over = False
+    pop_size = 10
+    population = []
+    max_play_time =  30
     try:
-        while not game_over:
-            for state in chromo.sequence:
-                auto_qwop.update_outputs(state)
-                time.sleep(.03)
-            game_over = auto_qwop.test_for_game_over(
-                auto_qwop.get_frame())
-        time.sleep(2)
+        for _ in range(pop_size):
+            population.append(Chromosome(
+                sequence=get_random_sequence(5),
+                fitness=0.0))
+        for chromo in population:
+            game_over = False
+            game_won = False
+            timed_out = False
+            start_time = time.time()
+            while not game_over and not game_won and not timed_out:
+                for state in chromo.sequence:
+                    auto_qwop.update_outputs(state)
+                    current_frame = auto_qwop.get_frame()
+                    game_over = auto_qwop.test_for_game_over(current_frame)
+                    game_won = auto_qwop.test_for_game_won(current_frame)
+                    if time.time() - start_time >= max_play_time:
+                        timed_out = True
+                    time.sleep(.033)
+            run_time = time.time() - start_time
+            print('Played for {} seconds'.format(run_time))
+            auto_qwop.restart()
     except Exception as e:
         print(e)
     finally:

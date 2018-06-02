@@ -60,3 +60,18 @@ def get_random_sequence(length):
         random_letter = format(random.randrange(16), 'x')
         sequence = '{}{}'.format(sequence, random_letter)
     return sequence
+
+def roulette(total_fitness, population):
+    """
+
+    Selects a member from the popluation via roulette wheel selection
+    """
+    pie_slice = random.random() * total_fitness
+    fitness_so_far = 0.0
+
+    for i in range(len(population)):
+        fitness_so_far += population[i].fitness
+
+        if fitness_so_far >= pie_slice:
+            return population[i]
+    return None

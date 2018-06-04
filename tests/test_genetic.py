@@ -88,3 +88,17 @@ def test_random_sequence():
     assert len(sequence) == sequence_length
     for letter in sequence:
         assert letter in hex_chars
+
+def test_different_length_crossover():
+    individual1 = Chromosome(sequence=get_random_sequence(100))
+    individual2 = Chromosome(sequence=get_random_sequence(10))
+    offspring1, offspring2 = crossover(individual1, individual2, 1.0)
+    assert offspring1.sequence != individual1.sequence
+    assert offspring1.sequence != individual2.sequence
+    assert offspring2.sequence != individual1.sequence
+    assert offspring2.sequence != individual2.sequence
+    print(individual1.sequence)
+    print(offspring1.sequence)
+    print(individual2.sequence)
+    print(offspring2.sequence)
+    assert False

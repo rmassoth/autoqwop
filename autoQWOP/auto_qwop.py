@@ -6,6 +6,7 @@ automation and selenium for web browser automation.
 """
 import time
 import io
+import random
 
 from selenium import webdriver
 from selenium.webdriver.support.ui import WebDriverWait
@@ -222,7 +223,7 @@ def main():
     auto_qwop = AUTOQWOP()
     auto_qwop.load_website()
     auto_qwop.get_game()
-    pop_size = 20
+    pop_size = 100
     population = []
     max_play_time =  300
     crossover_rate = 0.7
@@ -230,13 +231,17 @@ def main():
     generations = 0
     fittest = 0.0
     total_fitness = 0.0
+    max_chromo_length = 300
+    fittest_ind = 0
+    goal = 0.01
     try:
         for _ in range(pop_size):
             #Create initial population
             population.append(Chromosome(
-                sequence=get_random_sequence(100),
+                sequence=get_random_sequence(
+                    random.randrange(max_chromo_length)),
                 fitness=0.0))
-        while fittest < 1.1:
+        while fittest < goal:
             for i, chromo in enumerate(population):
                 #Loop over each member of the population
                 game_over = False
@@ -265,7 +270,9 @@ def main():
                     population[i].fitness = run_time/max_play_time
                 if population[i].fitness > fittest:
                     fittest = population[i].fitness
-                print('Played for {} seconds'.format(run_time))
+                    fittest_ind = i
+                print('Played for {} seconds. Chromo length: {}'\
+                    .format(run_time, len(population[i].sequence)))
                 total_fitness += population[i].fitness
                 auto_qwop.restart()
             temp_pop = []
@@ -292,6 +299,9 @@ def main():
             generations += 1
             print("Generation {}".format(generations))
             print("Total fitness = {}".format(total_fitness))
+        print("You did it!")
+        with open('sequence.txt', 'w') as f:
+            print(population[fittest_ind].sequence, file=f)
     except Exception as e:
         print(e)
     finally:

@@ -233,7 +233,7 @@ def main():
     total_fitness = 0.0
     max_chromo_length = 300
     fittest_ind = 0
-    goal = 0.01
+    goal = 1.1
     try:
         for _ in range(pop_size):
             #Create initial population

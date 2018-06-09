@@ -161,7 +161,7 @@ class AUTOQWOP:
         Compare an image to the master failed image. Return True if they
         are similar, False if not.
         """
-        failed_threshold = 5000
+        failed_threshold = 10000
         image_offset = (126, 99, 510, 297,)
         cropped_image = image.crop(image_offset)
         failed_image = Image.open("autoqwop/images/failed_test.png")

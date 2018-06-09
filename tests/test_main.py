@@ -1,13 +1,11 @@
 import time
 
-from autoQWOP.auto_qwop import AUTOQWOP
-from selenium.webdriver.firefox.webdriver import WebDriver
-from selenium.webdriver.firefox.webelement import FirefoxWebElement
-
 import pytest
-
+from selenium.webdriver.firefox.webelement import FirefoxWebElement
 from PIL import Image
 import numpy as np
+
+from autoqwop.auto_qwop import AUTOQWOP
 
 
 @pytest.fixture(scope="module")
@@ -58,11 +56,11 @@ def test_failed_state(qwop):
     assert qwop.test_for_game_over(image6) == False
 
 def test_restart(qwop):
-    qwop.update_outputs((False, False, True, True))
+    qwop.update_outputs(('3'))
     
     while(not qwop.test_for_game_over(qwop.get_frame())):
         time.sleep(1)
-    qwop.update_outputs((False, False, False, False))
+    qwop.update_outputs(('0'))
     qwop.restart()
     assert qwop.test_for_game_over(qwop.get_frame()) == False
 

@@ -1,6 +1,6 @@
 import pytest
 
-from autoQWOP.genetic import (
+from autoqwop.genetic import (
     Chromosome,
     crossover,
     mutate,
@@ -101,4 +101,3 @@ def test_different_length_crossover():
     print(offspring1.sequence)
     print(individual2.sequence)
     print(offspring2.sequence)
-    assert False

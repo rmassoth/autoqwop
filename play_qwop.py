@@ -6,6 +6,7 @@ automation and selenium for web browser automation.
 """
 import time
 import random
+import argparse
 
 from autoqwop.auto_qwop import AUTOQWOP
 from autoqwop.genetic import (
@@ -21,6 +22,13 @@ def main():
 
     Run many iterations and evolve the best combination of keys and time 
     """
+    parser = argparse.ArgumentParser(description='''
+        Run a genetic algorithm to play the game qwop''')
+    parser.add_argument('--save', '-s', default='./')
+
+    args = parser.parse_args()
+    print(args)
+    exit()
     auto_qwop = AUTOQWOP()
     auto_qwop.load_website()
     auto_qwop.get_game()

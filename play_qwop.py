@@ -7,6 +7,8 @@ automation and selenium for web browser automation.
 import time
 import random
 import argparse
+import glob
+import os
 
 from autoqwop.auto_qwop import AUTOQWOP
 from autoqwop.genetic import (
@@ -22,13 +24,12 @@ def main():
 
     Run many iterations and evolve the best combination of keys and time 
     """
+
     parser = argparse.ArgumentParser(description='''
         Run a genetic algorithm to play the game qwop''')
-    parser.add_argument('--save', '-s', default='./')
-
+    parser.add_argument('--save', '-s', action='store_true')
     args = parser.parse_args()
-    print(args)
-    exit()
+
     auto_qwop = AUTOQWOP()
     auto_qwop.load_website()
     auto_qwop.get_game()
@@ -43,6 +44,7 @@ def main():
     max_chromo_length = 300
     fittest_ind = 0
     goal = 1.1
+    image_counter = 0
     try:
         for _ in range(pop_size):
             #Create initial population
@@ -59,19 +61,27 @@ def main():
                 start_time = time.time()
                 total_fitness = 0.0
                 fittest = 0.0
+                iters = 0
                 while not game_over and not game_won and not timed_out:
                     #Keep looping until game has ended
                     for state in chromo.sequence:
                         #Loop over the steps in the sequence
                         auto_qwop.update_outputs(state)
-                        current_frame = auto_qwop.get_frame()
-                        game_over = auto_qwop.test_for_game_over(current_frame)
-                        game_won = auto_qwop.test_for_game_won(current_frame)
+                        if iters == 0 or iters % 30 == 0:
+                            current_frame = auto_qwop.get_frame()
+                            game_over = auto_qwop.test_for_game_over(current_frame)
+                            game_won = auto_qwop.test_for_game_won(current_frame)
+                            if args.save:
+                                current_frame.save(
+                                    './play_images/{}.png'.format(image_counter),
+                                    'PNG')
+                                image_counter += 1
                         if time.time() - start_time >= max_play_time:
                             timed_out = True
-                        time.sleep(.033)
+                        
                         if game_over or game_won or timed_out:
                             break
+                        iters += 1
                 run_time = time.time() - start_time
                 if game_won:
                     population[i].fitness = 86/run_time
@@ -80,8 +90,9 @@ def main():
                 if population[i].fitness > fittest:
                     fittest = population[i].fitness
                     fittest_ind = i
-                print('Played for {} seconds. Chromo length: {}'\
-                    .format(run_time, len(population[i].sequence)))
+                print('Played for {} seconds. Chromo length: {}, fps: {}'\
+                    .format(run_time, len(population[i].sequence),
+                        iters/run_time))
                 total_fitness += population[i].fitness
                 auto_qwop.restart()
             temp_pop = []

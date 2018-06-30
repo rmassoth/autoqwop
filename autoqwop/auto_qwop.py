@@ -18,6 +18,8 @@ from selenium.common.exceptions import TimeoutException
 from selenium.webdriver.common.action_chains import ActionChains
 from selenium.webdriver.common.keys import Keys
 
+import pytesseract
+
 
 class AUTOQWOP:
     """
@@ -47,10 +49,10 @@ class AUTOQWOP:
         Initialize the browser and click the game window to get started
         """
         try:
-            self.game = WebDriverWait(self.driver, 20).until(
+            self.game = WebDriverWait(self.driver, 600).until(
                 EC.presence_of_element_located((By.ID, "window1")))
             print("Game window found")
-            time.sleep(5)
+            time.sleep(1)
             self.game.click()
         except TimeoutException:
             print("Game took too much time to load!")
@@ -161,7 +163,7 @@ class AUTOQWOP:
         Compare an image to the master failed image. Return True if they
         are similar, False if not.
         """
-        failed_threshold = 10000
+        failed_threshold = 20000
         image_offset = (126, 99, 510, 297,)
         cropped_image = image.crop(image_offset)
         failed_image = Image.open("autoqwop/images/failed_test.png")
@@ -180,7 +182,7 @@ class AUTOQWOP:
         Compare an image to the master failed image. Return True if they
         are similar, False if not.
         """
-        finished_threshold = 10000
+        finished_threshold = 20000
         image_offset = (126, 99, 510, 297,)
         cropped_image = image.crop(image_offset)
         finished_image = Image.open("autoqwop/images/finish_test.png")
@@ -211,3 +213,17 @@ class AUTOQWOP:
         actions.key_down(Keys.SPACE).key_up(Keys.SPACE)
         actions.perform()
     
+    def get_distance(self, image):
+        image_offset = (190, 20, 420, 50,)
+        cropped_image = image.crop(image_offset)
+        #cropped_image.show()
+        distance_string = pytesseract.image_to_string(cropped_image)
+        extracted_number_array = []
+        for i in distance_string:
+            if i.isnumeric() or i in ['.', '-']:
+                extracted_number_array.append(i)
+        extracted_number = ''.join(extracted_number_array)
+        try:
+            return float(extracted_number)
+        except ValueError:
+            return 0.0

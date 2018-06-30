@@ -64,3 +64,12 @@ def test_restart(qwop):
     qwop.restart()
     assert qwop.test_for_game_over(qwop.get_frame()) == False
 
+def test_check_distance(qwop):
+    image1 = Image.open("tests/images/failed1.png")
+    image2 = Image.open("tests/images/failed2.png")
+    image3 = Image.open("tests/images/failed3.png")
+    image4 = Image.open("tests/images/nodistance.png")
+    assert qwop.get_distance(image1) == -0.7
+    assert qwop.get_distance(image2) == 10
+    assert qwop.get_distance(image3) == 5.3
+    assert qwop.get_distance(image4) == 0.0

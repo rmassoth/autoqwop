@@ -36,7 +36,7 @@ def main():
     population = []
     max_play_time = 30
     crossover_rate = 0.7
-    mutation_rate = 0.5
+    mutation_rate = 0.05
     generations = 0
     fittest = 0.0
     total_fitness = 0.0

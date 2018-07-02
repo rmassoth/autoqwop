@@ -144,6 +144,8 @@ def main():
             with open('{}.txt'.format(datetime.datetime()), 'a') as f:
                 print('Generation {}'.format(generations), file=f)
                 print(total_fitness, file=f)
+                print(population[fittest_ind].sequence, file=f)
+                print(population[fittest_ind].fitness, file=f)
 
             while len(temp_pop) < pop_size:
                 """

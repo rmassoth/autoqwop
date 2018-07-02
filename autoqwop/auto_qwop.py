@@ -51,8 +51,8 @@ class AUTOQWOP:
         try:
             self.game = WebDriverWait(self.driver, 600).until(
                 EC.presence_of_element_located((By.ID, "window1")))
-            print("Game window found")
-            time.sleep(1)
+            #print("Game window found")
+            time.sleep(2)
             self.game.click()
         except TimeoutException:
             print("Game took too much time to load!")

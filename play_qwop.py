@@ -114,22 +114,36 @@ def main():
                     fittest = population[i].fitness
                     fittest_ind = i
 
-                print('Ran {} meters in {} seconds!'.format(distance,
-                    run_time))
+                # print('Ran {} meters in {} seconds!'.format(distance,
+                #     run_time))
                 total_fitness += population[i].fitness
                 if timed_out:
-                    auto_qwop.driver.refresh()
-                    auto_qwop.get_game()
+                    auto_qwop.update_outputs('3')
+                    time.sleep(0.5)
+                    auto_qwop.update_outputs('4')
+                    time.sleep(0.5)
+                    auto_qwop.update_outputs('2')
+                    #Commit "suicide" so we don't have to refresh the page
+                    #every time.  Saves time and bandwidth.
+                    suicide_attempts = 0
+                    while not game_over and suicide_attempts < 10:
+                        game_over = auto_qwop.test_for_game_over(
+                            auto_qwop.get_frame())
+                        suicide_attempts += 1
+                        time.sleep(1)
+                    if game_over:
+                        auto_qwop.restart()
+                    else:
+                        auto_qwop.driver.refresh()
+                        auto_qwop.get_game()
                 else:
                     auto_qwop.restart()
             auto_qwop.driver.quit()
             temp_pop = []
 
-            # with open('sequence.txt', 'a') as f:
-            #     print('Generation {}'.format(generations), file=f)
-            #     for i in population:
-            #         print(i.sequence, file=f)
-            #         print(i.fitness, file=f)
+            with open('{}.txt'.format(datetime.datetime()), 'a') as f:
+                print('Generation {}'.format(generations), file=f)
+                print(total_fitness, file=f)
 
             while len(temp_pop) < pop_size:
                 """

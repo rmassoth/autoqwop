@@ -9,6 +9,7 @@ import random
 import argparse
 import glob
 import os
+import datetime
 
 from autoqwop.auto_qwop import AUTOQWOP
 from autoqwop.genetic import (
@@ -35,7 +36,7 @@ def main():
     population = []
     max_play_time = 30
     crossover_rate = 0.7
-    mutation_rate = 0.01
+    mutation_rate = 0.5
     generations = 0
     fittest = 0.0
     total_fitness = 0.0
@@ -44,6 +45,7 @@ def main():
     goal = 20
     image_counter = 0
     step_execute_time = 0.1
+    run_instance = datetime.datetime.now().isoformat()
     try:
         if args.seed:
             for _ in range(pop_size):
@@ -56,7 +58,8 @@ def main():
                 #Create initial population
                 population.append(Chromosome(
                     sequence=get_random_sequence(
-                        random.randrange(max_chromo_length, max_chromo_length+1)),
+                        random.randrange(
+                            max_chromo_length, max_chromo_length+1)),
                     fitness=0.0))
         while fittest < goal:
             auto_qwop = AUTOQWOP()
@@ -141,7 +144,8 @@ def main():
             auto_qwop.driver.quit()
             temp_pop = []
 
-            with open('{}.txt'.format(datetime.datetime()), 'a') as f:
+            with open('{}.txt'.format(run_instance),
+                'a') as f:
                 print('Generation {}'.format(generations), file=f)
                 print(total_fitness, file=f)
                 print(population[fittest_ind].sequence, file=f)

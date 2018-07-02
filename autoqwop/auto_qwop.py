@@ -100,10 +100,10 @@ class AUTOQWOP:
             actions.key_up("o")
             actions.key_down("p")
         elif key_state == '5':
-            actions.key_down("q")
+            actions.key_up("q")
             actions.key_down("w")
             actions.key_up("o")
-            actions.key_up("p")
+            actions.key_down("p")
         elif key_state == '6':
             actions.key_down("q")
             actions.key_up("w")
@@ -120,10 +120,10 @@ class AUTOQWOP:
             actions.key_down("o")
             actions.key_up("p")
         elif key_state == '9':
-            actions.key_up("q")
+            actions.key_down("q")
             actions.key_down("w")
             actions.key_up("o")
-            actions.key_down("p")
+            actions.key_up("p")
         elif key_state == 'a':
             actions.key_up("q")
             actions.key_up("w")

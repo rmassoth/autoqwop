@@ -43,7 +43,7 @@ def mutate(individual, mutation_rate):
     new_chromo = Chromosome(sequence=individual.sequence)
     if random.random() < mutation_rate:
         position = random.randrange(len(individual.sequence))
-        mutation = format(random.randrange(16), 'x')
+        mutation = format(random.randrange(9), 'x')
         sequence_list = list(individual.sequence)
         sequence_list[position] = mutation
         new_sequence_string = ''.join(sequence_list)
@@ -57,7 +57,7 @@ def get_random_sequence(length):
     """
     sequence = ''
     for i in range(length):
-        random_letter = format(random.randrange(16), 'x')
+        random_letter = format(random.randrange(9), 'x')
         sequence = '{}{}'.format(sequence, random_letter)
     return sequence
 

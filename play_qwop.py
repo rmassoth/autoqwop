@@ -100,6 +100,7 @@ def main():
                         if execution_time < step_execute_time:
                             time.sleep(step_execute_time - execution_time)
                         #print(time.time() - step_start_time)
+                current_frame = auto_qwop.get_frame()
                 run_time = time.time() - start_time
                 distance = auto_qwop.get_distance(current_frame)
                 speed = distance/run_time

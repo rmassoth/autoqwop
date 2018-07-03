@@ -75,6 +75,7 @@ def main():
                 start_time = time.time()
                 iters = 0
                 current_frame = None
+                time.sleep(1)
                 while not game_over and not game_won and not timed_out:
                     #Keep looping until game has ended
                     for state in chromo.sequence:
@@ -103,6 +104,7 @@ def main():
                         if execution_time < step_execute_time:
                             time.sleep(step_execute_time - execution_time)
                         #print(time.time() - step_start_time)
+                auto_qwop.update_outputs('0')
                 current_frame = auto_qwop.get_frame()
                 run_time = time.time() - start_time
                 distance = auto_qwop.get_distance(current_frame)

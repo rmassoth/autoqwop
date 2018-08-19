@@ -32,17 +32,17 @@ def main():
     parser.add_argument('--seed')
     args = parser.parse_args()
 
-    pop_size = 100
+    pop_size = 20
     population = []
-    max_play_time = 30
+    max_play_time = 20
     crossover_rate = 0.7
     mutation_rate = 0.05
     generations = 0
     fittest = 0.0
     total_fitness = 0.0
-    max_chromo_length = 100
+    max_chromo_length = 40
     fittest_ind = 0
-    goal = 20
+    goal = int(max_play_time * 0.8) 
     image_counter = 0
     step_execute_time = 0.1
     run_instance = datetime.datetime.now().isoformat()
@@ -50,8 +50,10 @@ def main():
         if args.seed:
             for _ in range(pop_size):
                 #Create initial population
+                seed_chromo = Chromosome(sequence=args.seed, fitness=0.0)
+                mutated_seed = mutate(seed_chromo, mutation_rate)
                 population.append(Chromosome(
-                    sequence=args.seed,
+                    sequence=mutated_seed.sequence,
                     fitness=0.0))
         else:
             for _ in range(pop_size):
@@ -123,11 +125,11 @@ def main():
                 #     run_time))
                 total_fitness += population[i].fitness
                 if timed_out:
-                    auto_qwop.update_outputs('3')
+                    auto_qwop.update_outputs('2')
                     time.sleep(0.5)
                     auto_qwop.update_outputs('4')
                     time.sleep(0.5)
-                    auto_qwop.update_outputs('2')
+                    auto_qwop.update_outputs('1')
                     #Commit "suicide" so we don't have to refresh the page
                     #every time.  Saves time and bandwidth.
                     suicide_attempts = 0
@@ -136,6 +138,7 @@ def main():
                             auto_qwop.get_frame())
                         suicide_attempts += 1
                         time.sleep(1)
+                    auto_qwop.update_outputs('0')
                     if game_over:
                         auto_qwop.restart()
                     else:
@@ -148,10 +151,11 @@ def main():
 
             with open('{}.txt'.format(run_instance),
                 'a') as f:
-                print('Generation {}'.format(generations), file=f)
-                print(total_fitness, file=f)
-                print(population[fittest_ind].sequence, file=f)
-                print(population[fittest_ind].fitness, file=f)
+                print('Generation {}, {}, {}, {}'.format(
+                    generations,
+                    total_fitness,
+                    population[fittest_ind].sequence,
+                    population[fittest_ind].fitness), file=f)
 
             while len(temp_pop) < pop_size:
                 """
@@ -173,15 +177,16 @@ def main():
                 temp_pop.append(offspring2)
             #copy temp_pop to population before starting all over again
             population = temp_pop
-            generations += 1
             print("Generation {}".format(generations))
             print("Total fitness = {}".format(total_fitness))
+            generations += 1
         print("You did it!")
         with open('sequence.txt', 'a') as f:
             print(population[fittest_ind].sequence, file=f)
             print(population[fittest_ind].fitness, file=f)
     except Exception as e:
         print(e)
+        raise(e)
     finally:
         #clean up
         auto_qwop.driver.quit()
